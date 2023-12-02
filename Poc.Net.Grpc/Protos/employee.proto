@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option csharp_namespace = "Poc.Net.Grpc.Protos";
+import "google/api/annotations.proto";
+
+service Employee {
+	rpc Post(EmployeeRequest) returns (Null) {
+		option (google.api.http) = {
+			post: "/v1/employee"
+			body: "*"
+		};
+	}
+	rpc Get(Null) returns (EmployeeResponse) {
+		option (google.api.http) = {
+			get: "/v1/employee"
+		};
+	}
+}
+
+message Null {}
+
+message EmployeeRequest {
+	string role = 1;
+	string company = 2;
+	string location = 3; 
+	bool remote = 4;
+	string link = 5;
+	double salary = 6;
+}
+
+message EmployeeResponse {
+	repeated EmployeeResponseData data = 1;
+}
+
+message EmployeeResponseData {
+	int32 id = 1;
+	string role = 2;
+	string company = 3;
+	string location = 4; 
+	bool remote = 5;
+	string link = 6;
+	double salary = 7;
+	string createdAt = 8;
+	string updatedAt = 9;
+	string deletedAt = 10;
+}

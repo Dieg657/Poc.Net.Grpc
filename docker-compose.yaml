@@ -1,0 +1,36 @@
+version: '3'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "master.007,01"
+    networks:
+      - backend
+  mssqltools:
+    image: mcr.microsoft.com/mssql-tools
+    volumes:
+      - ./create-database-sql-server.sql:/tmp/create-database-sql-server.sql
+      - ./init-script-database.sh:/tmp/init-script-database.sh
+    command: /bin/bash ./tmp/init-script-database.sh
+    depends_on:
+      - sqlserver
+    networks:
+      - backend
+  poc-grpc:
+    build: .
+    ports:
+      - 8080:80
+    environment:
+      ConnectionStrings__MSSQL_CONNECTION: 'Data Source=sqlserver;Initial Catalog=POC;User ID=sa;Password=master.007,01;TrustServerCertificate=true; MultipleActiveResultSets=true;Pooling=true;'
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:80"
+    depends_on:
+      - sqlserver
+      - mssqltools
+    networks:
+      - backend
+networks:
+  backend:
